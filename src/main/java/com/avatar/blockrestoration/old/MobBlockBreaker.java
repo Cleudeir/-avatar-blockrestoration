@@ -17,7 +17,6 @@ import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = main.MODID)
 public class MobBlockBreaker {
     private static Mob currentMob;
     private static ServerLevel currentWorld;

@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.avatar.blockrestoration.main;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,9 +28,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = main.MODID)
 public class MobSpawnHandler {
     private static final int DAYS_INTERVAL = 7;
     private static final List<LivingEntity> currentWaveMobs = new ArrayList<>();

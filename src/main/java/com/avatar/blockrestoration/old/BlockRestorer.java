@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = main.MODID)
 public class BlockRestorer {
 
     private static final List<BlockEntry> brokenBlocks = new ArrayList<>();

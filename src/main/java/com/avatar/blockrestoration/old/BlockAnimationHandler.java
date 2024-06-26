@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.AirBlock;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = main.MODID)
 public class BlockAnimationHandler {
 
     public static void animateBlock(ServerLevel world, BlockPos animationPos) {

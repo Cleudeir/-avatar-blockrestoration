@@ -28,7 +28,7 @@ public class storage {
     }
 
     private static Path getConfigFilePath(String name) {
-        return Paths.get("./config/avatar-blockrestoration_" + name + "_" + getWorldName() + ".json");
+        return Paths.get("./config/blockrestoration_" + name + "_" + getWorldName() + ".json");
     }
 
     public static HashSet<UUID> loadInitialItemsData(String name) {
