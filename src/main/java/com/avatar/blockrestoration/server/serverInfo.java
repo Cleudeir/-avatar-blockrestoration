@@ -4,21 +4,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import com.avatar.blockrestoration.main;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.EntityTypeTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
@@ -37,6 +33,7 @@ public class serverInfo {
     private static List<Mob> currentMobs = new ArrayList<Mob>();
     private static List<Monster> currentMonsters = new ArrayList<Monster>();
     private static List<Animal> currentAnimals = new ArrayList<Animal>();
+    private static List<AmbientCreature> currentAmbientCreatures = new ArrayList<AmbientCreature>();
 
     @SubscribeEvent
     public static void ticksServer(TickEvent.ServerTickEvent event) {
@@ -57,6 +54,7 @@ public class serverInfo {
                 currentMobs.clear();
                 currentMonsters.clear();
                 currentAnimals.clear();
+                currentAmbientCreatures.clear();
                 for (ServerPlayer player : players) {
                     double px = player.getX();
                     double py = player.getY();
@@ -69,14 +67,13 @@ public class serverInfo {
                     List<Mob> mobs = world.getEntitiesOfClass(Mob.class, boundingBox);
                     List<Monster> monsters = world.getEntitiesOfClass(Monster.class, boundingBox);
                     List<Animal> animals = world.getEntitiesOfClass(Animal.class, boundingBox);
+                    List<AmbientCreature> ambientCreatures = world.getEntitiesOfClass(AmbientCreature.class,
+                            boundingBox);
+                    currentAmbientCreatures.addAll(ambientCreatures);
                     currentAnimals.addAll(animals);
+                    currentMonsters.addAll(monsters);
+                    currentMobs.addAll(mobs);
 
-                    if (monsters != null) {
-                        currentMonsters.addAll(monsters);
-                    }
-                    if (mobs != null) {
-                        currentMobs.addAll(mobs);
-                    }
                 }
 
                 currentPlayers = players;
@@ -109,6 +106,8 @@ public class serverInfo {
                             false);
                     player.sendSystemMessage(Component.literal("Animals qnt: " + currentAnimals.size() + ", types: "
                             + getAllNameType(currentAnimals)), false);
+                    player.sendSystemMessage(Component.literal("AmbientCreatures qnt: " + currentAmbientCreatures.size()
+                            + ", types: " + getAllNameType(currentAmbientCreatures)), false);
                     player.sendSystemMessage(Component.literal("Players: " + currentPlayers.size()), false);
                 }
             }
@@ -120,6 +119,14 @@ public class serverInfo {
         Set<String> mobTypes = new HashSet<>();
         Set<Set<String>> mobTags = new HashSet<>();
         for (T mob : entities) {
+            String mobImpulse = mob.getSoundSource().toString();
+            String mobClass = mob.getClass().toString();
+            System.out.println(mobClass);
+
+            if (mobImpulse == "HOSTILE") {
+                String mobName = mob.getType().toString().replaceAll("entity.minecraft.", "");
+                System.out.println(mobName);
+            }
             String type = mob.getType().toString().replaceAll("entity.minecraft.", "");
             Set<String> tags = mob.getTags();
             mobTypes.add(type);
