@@ -6,18 +6,24 @@ import java.util.List;
 import java.util.Set;
 
 import com.avatar.blockrestoration.main;
+import com.avatar.blockrestoration.function.BlockRestorer;
 
-import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.ambient.AmbientCreature;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -43,11 +49,13 @@ public class serverInfo {
                 System.out.println(Monster.class.arrayType());
             }
             ServerLevel world = event.getServer().getLevel(Level.OVERWORLD);
+
             if (world == null)
                 return;
             long time = world.getDayTime();
             if (time % 20 == 0) {
                 currentWorld = world;
+
                 List<ServerPlayer> players = event.getServer().getPlayerList().getPlayers();
                 if (players == null)
                     return;
@@ -92,26 +100,55 @@ public class serverInfo {
 
                 int minutes = (int) ((percentDay % 1000) / 16.6667);
                 currentMinutes = minutes;
+
+            }
+            if (time % 20 * 1 / 10 == 0 && !isNight && currentPlayers != null) {
+                BlockRestorer.restoreBlocks();
+            }
+            if (time % 20 * 8 == 0 && currentPlayers != null) {
+                BlockRestorer.setWorld(currentWorld);
+                BlockRestorer.animateBlockDestroyed();
             }
             if (time % 20 * 1 == 0 && currentPlayers != null) {
-                for (ServerPlayer player : currentPlayers) {
-                    player.sendSystemMessage(Component.literal("Day: " + currentDay), false);
-                    player.sendSystemMessage(Component.literal("Time: " + currentHours + ":" + currentMinutes),
-                            false);
-                    player.sendSystemMessage(Component.literal("IsNight: " + isNight), false);
-                    player.sendSystemMessage(Component.literal("Mobs qnt: " + currentMobs.size() + ", types: "
-                            + getAllNameType(currentMobs)), false);
-                    player.sendSystemMessage(Component.literal("Monsters qnt: " + currentMonsters.size() + ", types: "
-                            + getAllNameType(currentMonsters)),
-                            false);
-                    player.sendSystemMessage(Component.literal("Animals qnt: " + currentAnimals.size() + ", types: "
-                            + getAllNameType(currentAnimals)), false);
-                    player.sendSystemMessage(Component.literal("AmbientCreatures qnt: " + currentAmbientCreatures.size()
-                            + ", types: " + getAllNameType(currentAmbientCreatures)), false);
-                    player.sendSystemMessage(Component.literal("Players: " + currentPlayers.size()), false);
-                }
+                /*
+                 * for (ServerPlayer player : currentPlayers) {
+                 * player.sendSystemMessage(Component.literal("Day: " + currentDay), false);
+                 * player.sendSystemMessage(Component.literal("Time: " + currentHours + ":" +
+                 * currentMinutes),
+                 * false);
+                 * player.sendSystemMessage(Component.literal("IsNight: " + isNight), false);
+                 * player.sendSystemMessage(Component.literal("Mobs qnt: " + currentMobs.size()
+                 * + ", types: "
+                 * + getAllNameType(currentMobs)), false);
+                 * player.sendSystemMessage(Component.literal("Monsters qnt: " +
+                 * currentMonsters.size() + ", types: "
+                 * + getAllNameType(currentMonsters)),
+                 * false);
+                 * player.sendSystemMessage(Component.literal("Animals qnt: " +
+                 * currentAnimals.size() + ", types: "
+                 * + getAllNameType(currentAnimals)), false);
+                 * player.sendSystemMessage(Component.literal("AmbientCreatures qnt: " +
+                 * currentAmbientCreatures.size()
+                 * + ", types: " + getAllNameType(currentAmbientCreatures)), false);
+                 * player.sendSystemMessage(Component.literal("Players: " +
+                 * currentPlayers.size()), false);
+                 * }
+                 */
             }
 
+        }
+    }
+
+    @SubscribeEvent
+    public static void onExplosion(ExplosionEvent.Detonate event) {
+        if (event.getExplosion().getExploder() instanceof Creeper && currentWorld != null) {
+            List<BlockPos> affectedBlocks = event.getAffectedBlocks();
+            for (BlockPos pos : affectedBlocks) {
+                BlockState state = currentWorld.getBlockState(pos);
+                if (state.getBlock() != Blocks.AIR) {
+                    BlockRestorer.addBrokenBlock(pos, state);
+                }
+            }
         }
     }
 

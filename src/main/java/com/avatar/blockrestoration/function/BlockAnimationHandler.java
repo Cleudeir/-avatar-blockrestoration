@@ -1,12 +1,9 @@
-package com.avatar.blockrestoration.old;
-
-import com.avatar.blockrestoration.main;
+package com.avatar.blockrestoration.function;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.AirBlock;
-import net.minecraftforge.fml.common.Mod;
 
 public class BlockAnimationHandler {
 
