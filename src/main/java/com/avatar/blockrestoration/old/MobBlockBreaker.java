@@ -1,6 +1,8 @@
-package com.example.bigmode;
+package com.avatar.blockrestoration.old;
 
 import java.util.List;
+
+import com.avatar.blockrestoration.main;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -15,7 +17,7 @@ import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = YourMod.MODID)
+@Mod.EventBusSubscriber(modid = main.MODID)
 public class MobBlockBreaker {
     private static Mob currentMob;
     private static ServerLevel currentWorld;

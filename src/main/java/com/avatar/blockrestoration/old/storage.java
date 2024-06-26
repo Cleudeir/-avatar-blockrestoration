@@ -1,4 +1,4 @@
-package com.example.bigmode;
+package com.avatar.blockrestoration.old;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -28,7 +28,7 @@ public class storage {
     }
 
     private static Path getConfigFilePath(String name) {
-        return Paths.get("./config/bigmode_" + name + "_" + getWorldName() + ".json");
+        return Paths.get("./config/avatar-blockrestoration_" + name + "_" + getWorldName() + ".json");
     }
 
     public static HashSet<UUID> loadInitialItemsData(String name) {

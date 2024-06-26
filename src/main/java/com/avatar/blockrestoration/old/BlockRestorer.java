@@ -1,7 +1,9 @@
-package com.example.bigmode;
+package com.avatar.blockrestoration.old;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.avatar.blockrestoration.main;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -9,7 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = YourMod.MODID)
+@Mod.EventBusSubscriber(modid = main.MODID)
 public class BlockRestorer {
 
     private static final List<BlockEntry> brokenBlocks = new ArrayList<>();

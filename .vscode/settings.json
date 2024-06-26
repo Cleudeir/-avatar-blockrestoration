@@ -1,7 +1,8 @@
 {
     "cSpell.words": [
         "AABB",
-        "bigmode",
+        "avatar-blockrestoration",
+        "blockrestoration",
         "Cooldown",
         "gson",
         "Heightmap",
@@ -11,5 +12,6 @@
         "Respawn",
         "RESPAWNED"
     ],
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

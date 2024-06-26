@@ -1,9 +1,9 @@
-# bigmode
+# avatar-blockrestoration
 # dependence
 java 17
 # start Vscode
 ./gradlew :genVSCodeRuns
 # start project
-./gradlew :runClient # bigmode
+./gradlew :runClient # avatar-blockrestoration
 # build
 ./gradlew build

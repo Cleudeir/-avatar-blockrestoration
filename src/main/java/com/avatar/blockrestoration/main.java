@@ -1,4 +1,4 @@
-package com.example.bigmode;
+package com.avatar.blockrestoration;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -6,16 +6,15 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod(YourMod.MODID)
-public class YourMod {
-    public static final String MODID = "bigmode";
+@Mod(main.MODID)
+public class main {
+    public static final String MODID = "avatar-blockrestoration";
 
-    public YourMod() {
+    public main() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new MobSpawnHandler());
-        MinecraftForge.EVENT_BUS.register(new ModCommands());
+        MinecraftForge.EVENT_BUS.register(new serverInfo());
     }
 
     private void setup(final FMLCommonSetupEvent event) {

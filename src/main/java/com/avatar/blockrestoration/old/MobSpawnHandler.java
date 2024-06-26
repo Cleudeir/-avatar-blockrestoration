@@ -1,9 +1,11 @@
-package com.example.bigmode;
+package com.avatar.blockrestoration.old;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+
+import com.avatar.blockrestoration.main;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -30,7 +32,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = YourMod.MODID)
+@Mod.EventBusSubscriber(modid = main.MODID)
 public class MobSpawnHandler {
     private static final int DAYS_INTERVAL = 7;
     private static final List<LivingEntity> currentWaveMobs = new ArrayList<>();
