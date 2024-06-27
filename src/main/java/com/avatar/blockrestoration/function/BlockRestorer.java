@@ -1,7 +1,10 @@
 package com.avatar.blockrestoration.function;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -12,13 +15,36 @@ public class BlockRestorer {
     private static final List<BlockEntry> brokenBlocks = new ArrayList<>();
     private static int index = 0;
     private static ServerLevel currentWorld;
+    private static Set<BlockEntry> burningBlocks = new HashSet<>();
+
+    public static void setWorld(ServerLevel world) {
+        currentWorld = world;
+    }
 
     public static void addBrokenBlock(BlockPos pos, BlockState state) {
         brokenBlocks.add(new BlockEntry(pos, state));
     }
 
-    public static void setWorld(ServerLevel world) {
-        currentWorld = world;
+    public static void addBlockBurning(BlockPos pos, BlockState state) {
+        burningBlocks.add(new BlockEntry(pos, state));
+    }
+
+    public static void BlockBurningCheck() {
+        if (currentWorld != null && burningBlocks.size() > 0) {
+            Iterator<BlockEntry> iterator = burningBlocks.iterator();
+            while (iterator.hasNext()) {
+                BlockEntry item = iterator.next();
+                BlockPos pos = item.getPos();
+                BlockState state = item.state;
+                BlockState newState = currentWorld.getBlockState(pos);
+                if (newState.isAir()) {
+                    addBrokenBlock(pos, state);
+                    iterator.remove();
+                } else if (!newState.is(Blocks.FIRE)) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     public static void restoreBlocks() {
