@@ -70,8 +70,7 @@ public class server {
         BlockPos position = event.getPos();
 
         if (player != null) {
-            if (!state.is(Blocks.FIRE) || !state.isAir()) {
-                System.out.println(state);
+            if (!state.is(Blocks.FIRE) || !state.isAir()) {             
                 BlockRestorer.addPlayerBrokenBlock(position);
             }
         }

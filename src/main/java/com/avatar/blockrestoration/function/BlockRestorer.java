@@ -13,7 +13,6 @@ public class BlockRestorer {
     private static List<BlockPos> playerBrokenBlocks = new ArrayList<>();
 
     static {
-
         BlockRestorerDataDTO data = BlockRestorerDataHandler.load();
         aroundBlocksTable = data.getAroundBlocksTable();
         brokenBlocks = data.getBrokenBlocks();
@@ -83,7 +82,7 @@ public class BlockRestorer {
     }
 
     public static void restoreBlocks(ServerLevel world) {
-        System.out.println("restoreBlocks: " + brokenBlocks.size());
+       
         if (world != null && !brokenBlocks.isEmpty() && world != null) {
             Iterator<Map.Entry<BlockPos, BlockState>> iterator = brokenBlocks.entrySet().iterator();
             while (iterator.hasNext()) {

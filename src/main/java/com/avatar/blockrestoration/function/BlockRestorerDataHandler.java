@@ -66,8 +66,7 @@ public class BlockRestorerDataHandler {
         List<String> aroundBlocksTable = data.getAroundBlocksTableListBlockId();
         List<String> playerBrokenBlocks = data.getPlayerBrokenBlocksListBlockId();
 
-        System.out.println(aroundBlocksTable);
-        System.out.println(playerBrokenBlocks);
+      
         BROKEN_BLOCKS.set(brokenBlocks);
         AROUND_BLOCKS_TABLE.set(aroundBlocksTable);
         PLAYER_BROKEN_BLOCKS.set(playerBrokenBlocks);
@@ -114,6 +113,8 @@ public class BlockRestorerDataHandler {
             brokenBlocksGet = deserializeBlockMap(BROKEN_BLOCKS.get());
             aroundBlocksTableGet = deserializeBlockMap(AROUND_BLOCKS_TABLE.get());
             playerBrokenBlocksGet = deserializeBlockList(PLAYER_BROKEN_BLOCKS.get());
+            System.out.println(aroundBlocksTableGet);
+            System.out.println("Data loaded from config");
         }
         return new BlockRestorerDataDTO(
                 brokenBlocksGet,
