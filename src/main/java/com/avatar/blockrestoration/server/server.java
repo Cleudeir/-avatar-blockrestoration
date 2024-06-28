@@ -30,25 +30,30 @@ public class server {
     public static void ticksServer(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             ServerLevel world = event.getServer().getLevel(Level.OVERWORLD);
-            if (world == null)
-                return;
-            long time = world.getDayTime();
-            int timeDay = (int) (time % 24000);
-            boolean isNight = timeDay >= 13000 && timeDay <= 23000;
-            currentTime = time;
-            if (checkPeriod(1)) {
-                currentWorld = world;
-            }
-            BlockRestorerDataHandler.setWorld(world);
-            if (checkPeriod(1) && !isNight) {
-                BlockRestorer.restoreBlocks(world);
-            }
 
-            if (checkPeriod(4)) {
-                BlockRestorer.animateBlockDestroyed(world);
-            }
-            if (checkPeriod(5)) {
-                BlockRestorer.checkBlockStatesAroundTable(world);
+            if (world != null) {
+                long time = world.getDayTime();
+                int timeDay = (int) (time % 24000);
+                boolean isNight = timeDay >= 13000 && timeDay <= 23000;
+                currentTime = time;
+                if (currentWorld == null && checkPeriod(1)) {
+                    System.out.println("server started!!!!!!!");
+                    BlockRestorer.start(world);
+                }
+                if (checkPeriod(1)) {
+                    currentWorld = world;
+                }
+
+                if (checkPeriod(1) && !isNight) {
+                    BlockRestorer.restoreBlocks(world);
+                }
+
+                if (checkPeriod(4)) {
+                    BlockRestorer.animateBlockDestroyed(world);
+                }
+                if (checkPeriod(5)) {
+                    BlockRestorer.checkBlockStatesAroundTable(world);
+                }
             }
         }
     }
@@ -60,6 +65,12 @@ public class server {
             System.out.println("A table was placed in the world!");
             BlockPos tablePos = event.getPos();
             BlockRestorer.setBlockStatesTable(currentWorld, tablePos);
+        } else {
+            System.out.println("put block" + getPlacedBlock.toString());
+            BlockPos blockPos = event.getPos();
+            if (currentWorld != null) {
+                BlockRestorer.updateBlock(currentWorld, blockPos);
+            }
         }
     }
 
@@ -70,8 +81,10 @@ public class server {
         BlockPos position = event.getPos();
 
         if (player != null) {
-            if (!state.is(Blocks.FIRE) || !state.isAir()) {             
-                BlockRestorer.addPlayerBrokenBlock(position);
+            if (!state.is(Blocks.FIRE) || !state.isAir()) {
+                if (currentWorld != null) {
+                    BlockRestorer.updateBreakBlock(position);
+                }
             }
         }
         if (event.getState().getBlock() == Blocks.CRAFTING_TABLE) {
@@ -79,4 +92,5 @@ public class server {
             BlockRestorer.removeBlockStatesTable();
         }
     }
+
 }

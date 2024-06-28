@@ -1,27 +1,28 @@
 package com.avatar.blockrestoration.function;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockRestorer {
     private static Map<BlockPos, BlockState> brokenBlocks = new HashMap<>();
     private static Map<BlockPos, BlockState> aroundBlocksTable = new HashMap<>();
-    private static List<BlockPos> playerBrokenBlocks = new ArrayList<>();
 
-    static {
-        BlockRestorerDataDTO data = BlockRestorerDataHandler.load();
+    public static void start(ServerLevel world) {
+        BlockRestorerDataDTO data = BlockRestorerDataHandler.load(world);
         aroundBlocksTable = data.getAroundBlocksTable();
         brokenBlocks = data.getBrokenBlocks();
-        playerBrokenBlocks = data.getPlayerBrokenBlocks();
     }
 
     private static void saveData() {
         BlockRestorerDataHandler
-                .save(new BlockRestorerDataDTO(brokenBlocks, aroundBlocksTable, playerBrokenBlocks));
+                .save(new BlockRestorerDataDTO(brokenBlocks, aroundBlocksTable));
     }
 
     public static void addBrokenBlock(BlockPos pos, BlockState state) {
@@ -30,32 +31,38 @@ public class BlockRestorer {
     }
 
     public static void checkBlockStatesAroundTable(ServerLevel world) {
+        System.out.println(brokenBlocks.size());
         if (world != null && !aroundBlocksTable.isEmpty()) {
             Iterator<Map.Entry<BlockPos, BlockState>> iterator = aroundBlocksTable.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<BlockPos, BlockState> entry = iterator.next();
                 BlockPos pos = entry.getKey();
                 BlockState state = entry.getValue();
-                boolean isPlayerBroken = playerBrokenBlocks.contains(pos);
-                if (isPlayerBroken) {
-                    System.out.println("isPlayerBroken");
-                    System.out.println(isPlayerBroken);
-                }
                 boolean isBrokenBlock = brokenBlocks.containsKey(pos);
                 BlockState newState = world.getBlockState(pos);
                 if (newState != null && newState.getBlock() == Blocks.AIR
-                        && !isPlayerBroken
                         && !isBrokenBlock) {
                     brokenBlocks.put(pos, state);
                     iterator.remove();
-                    saveData();
                 }
             }
         }
+        saveData();
     }
 
-    public static void addPlayerBrokenBlock(BlockPos pos) {
-        playerBrokenBlocks.add(pos);
+    public static void updateBlock(ServerLevel world, BlockPos pos) {
+        System.out.println("updateBlock");
+        brokenBlocks.remove(pos);
+        BlockState state = world.getBlockState(pos);
+        System.out.println(state);
+        aroundBlocksTable.put(pos, state);
+        saveData();
+    }
+
+    public static void updateBreakBlock(BlockPos pos) {
+        System.out.println("updateBreakBlock");
+        aroundBlocksTable.remove(pos);
+        brokenBlocks.remove(pos);
         saveData();
     }
 
@@ -82,24 +89,27 @@ public class BlockRestorer {
     }
 
     public static void restoreBlocks(ServerLevel world) {
-       
-        if (world != null && !brokenBlocks.isEmpty() && world != null) {
+        if (world != null && !brokenBlocks.isEmpty()) {
             Iterator<Map.Entry<BlockPos, BlockState>> iterator = brokenBlocks.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<BlockPos, BlockState> entry = iterator.next();
                 BlockPos pos = entry.getKey();
                 BlockState state = entry.getValue();
-                boolean entityExists = world
-                        .getEntities(null, state.getShape(world, pos).bounds().move(pos))
-                        .size() > 0;
+                boolean entityExists = false;
 
-                if (state != null && state.getBlock() != Blocks.AIR && !entityExists) {
-                    world.setBlockAndUpdate(pos, state);
-                    iterator.remove();
-                    saveData();
+                if (state != null && state.getBlock() != Blocks.AIR) {
+                    VoxelShape shape = state.getShape(world, pos);
+                    if (!shape.isEmpty()) {
+                        entityExists = world.getEntities(null, shape.bounds().move(pos)).size() > 0;
+                    }
+                    if (!entityExists) {
+                        world.setBlockAndUpdate(pos, state);
+                        iterator.remove();
+                    }
                 }
             }
         }
+        saveData();
     }
 
     public static void animateBlockDestroyed(ServerLevel world) {

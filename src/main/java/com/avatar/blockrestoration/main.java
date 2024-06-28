@@ -1,5 +1,6 @@
 package com.avatar.blockrestoration;
 
+import com.avatar.blockrestoration.function.BlockRestorer;
 import com.avatar.blockrestoration.function.BlockRestorerDataHandler;
 import com.avatar.blockrestoration.server.server;
 

@@ -11,13 +11,10 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BlockRestorerDataDTO {
     Map<BlockPos, BlockState> brokenBlocks = new HashMap<>();
     Map<BlockPos, BlockState> aroundBlocksTable = new HashMap<>();
-    List<BlockPos> playerBrokenBlocks = new ArrayList<>();
 
-    public BlockRestorerDataDTO(Map<BlockPos, BlockState> brokenBlocks, Map<BlockPos, BlockState> aroundBlocksTable,
-            List<BlockPos> playerBrokenBlocks) {
+    public BlockRestorerDataDTO(Map<BlockPos, BlockState> brokenBlocks, Map<BlockPos, BlockState> aroundBlocksTable) {
         this.brokenBlocks = brokenBlocks;
         this.aroundBlocksTable = aroundBlocksTable;
-        this.playerBrokenBlocks = playerBrokenBlocks;
     }
 
     public Map<BlockPos, BlockState> getBrokenBlocks() {
@@ -57,13 +54,4 @@ public class BlockRestorerDataDTO {
     public List<String> getAroundBlocksTableListBlockId() {
         return getIdListMap(aroundBlocksTable);
     }
-
-    public List<BlockPos> getPlayerBrokenBlocks() {
-        return playerBrokenBlocks;
-    }
-
-    public List<String> getPlayerBrokenBlocksListBlockId() {
-        return getIdListList(playerBrokenBlocks);
-    }
-
 }

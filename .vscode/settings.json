@@ -2,7 +2,6 @@
     "cSpell.words": [
         "AABB",
         "blockrestoration",
-        "blockrestoration",
         "Cooldown",
         "gson",
         "Heightmap",
@@ -10,7 +9,8 @@
         "MODID",
         "OVERWORLD",
         "Respawn",
-        "RESPAWNED"
+        "RESPAWNED",
+        "Voxel"
     ],
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.compile.nullAnalysis.mode": "automatic",
