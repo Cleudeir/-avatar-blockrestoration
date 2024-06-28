@@ -1,10 +1,6 @@
 package com.avatar.blockrestoration.function;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -12,88 +8,102 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockRestorer {
-    private static final List<BlockEntry> brokenBlocks = new ArrayList<>();
-    private static int index = 0;
-    private static ServerLevel currentWorld;
-    private static Set<BlockEntry> burningBlocks = new HashSet<>();
+    private static final Map<BlockPos, BlockState> brokenBlocks = new HashMap<>();
+    private static final Map<BlockPos, BlockState> aroundBlocksTable = new HashMap<>();
+    private static final List<BlockPos> playerBrokenBlocks = new ArrayList<>();
 
-    public static void setWorld(ServerLevel world) {
-        currentWorld = world;
+    static {
+        BlockRestorerDataHandler.loadData(brokenBlocks, aroundBlocksTable, playerBrokenBlocks);
+    }
+
+    private static void saveData() {
+        BlockRestorerDataHandler.saveData(brokenBlocks, aroundBlocksTable, playerBrokenBlocks);
     }
 
     public static void addBrokenBlock(BlockPos pos, BlockState state) {
-        brokenBlocks.add(new BlockEntry(pos, state));
+        brokenBlocks.put(pos, state);
+        BlockRestorerDataHandler.saveData(brokenBlocks, aroundBlocksTable, playerBrokenBlocks);
     }
 
-    public static void addBlockBurning(BlockPos pos, BlockState state) {
-        burningBlocks.add(new BlockEntry(pos, state));
-    }
-
-    public static void BlockBurningCheck() {
-        if (currentWorld != null && burningBlocks.size() > 0) {
-            Iterator<BlockEntry> iterator = burningBlocks.iterator();
+    public static void checkBlockStatesAroundTable(ServerLevel world) {
+        if (world != null && !aroundBlocksTable.isEmpty()) {
+            Iterator<Map.Entry<BlockPos, BlockState>> iterator = aroundBlocksTable.entrySet().iterator();
             while (iterator.hasNext()) {
-                BlockEntry item = iterator.next();
-                BlockPos pos = item.getPos();
-                BlockState state = item.state;
-                BlockState newState = currentWorld.getBlockState(pos);
-                if (newState.isAir()) {
-                    addBrokenBlock(pos, state);
+                Map.Entry<BlockPos, BlockState> entry = iterator.next();
+                BlockPos pos = entry.getKey();
+                BlockState state = entry.getValue();
+                boolean isPlayerBroken = playerBrokenBlocks.contains(pos);
+                if (isPlayerBroken) {
+                    System.out.println("isPlayerBroken");
+                    System.out.println(isPlayerBroken);
+                }
+                boolean isBrokenBlock = brokenBlocks.containsKey(pos);
+                BlockState newState = world.getBlockState(pos);
+                if (newState != null && newState.getBlock() == Blocks.AIR
+                        && !isPlayerBroken
+                        && !isBrokenBlock) {
+                    brokenBlocks.put(pos, state);
                     iterator.remove();
-                } else if (!newState.is(Blocks.FIRE)) {
-                    iterator.remove();
+                    saveData();
                 }
             }
         }
     }
 
-    public static void restoreBlocks() {
-        if (brokenBlocks.size() > 0 && currentWorld != null) {
-            BlockEntry item = brokenBlocks.get(index);
-            BlockState state = item.getState();
-            BlockPos pos = item.getPos();
-            boolean entityExists = currentWorld.getEntities(null, state.getShape(currentWorld, pos).bounds().move(pos))
-                    .size() > 0;
-            System.out.println("brokenBlocks: " + brokenBlocks.size());
-            if (state != null && state != Blocks.AIR.defaultBlockState() && currentWorld != null && !entityExists) {
-                currentWorld.setBlockAndUpdate(pos, state);
-                brokenBlocks.remove(index);
-                index = 0;
-            } else {
-                if (index + 1 == brokenBlocks.size()) {
-                    index = 0;
-                } else {
-                    index++;
+    public static void addPlayerBrokenBlock(BlockPos pos) {
+        playerBrokenBlocks.add(pos);
+        saveData();
+    }
+
+    public static void setBlockStatesTable(ServerLevel world, BlockPos tablePos) {
+        int radius = 30;
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    BlockPos currentPos = tablePos.offset(x, y, z);
+                    BlockState blockState = world.getBlockState(currentPos);
+                    if (!blockState.is(Blocks.FIRE) && !blockState.is(Blocks.AIR)
+                            && !aroundBlocksTable.containsKey(currentPos)) {
+                        aroundBlocksTable.put(currentPos, blockState);
+                    }
+                }
+            }
+        }
+        saveData();
+    }
+
+    public static void removeBlockStatesTable() {
+        aroundBlocksTable.clear();
+        saveData();
+    }
+
+    public static void restoreBlocks(ServerLevel world) {
+        System.out.println("restoreBlocks: " + brokenBlocks.size());
+        if (world != null && !brokenBlocks.isEmpty() && world != null) {
+            Iterator<Map.Entry<BlockPos, BlockState>> iterator = brokenBlocks.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<BlockPos, BlockState> entry = iterator.next();
+                BlockPos pos = entry.getKey();
+                BlockState state = entry.getValue();
+                boolean entityExists = world
+                        .getEntities(null, state.getShape(world, pos).bounds().move(pos))
+                        .size() > 0;
+
+                if (state != null && state.getBlock() != Blocks.AIR && !entityExists) {
+                    world.setBlockAndUpdate(pos, state);
+                    iterator.remove();
+                    saveData();
                 }
             }
         }
     }
 
-    public static void animateBlockDestroyed() {
-        if (brokenBlocks.size() > 0 && currentWorld != null) {
-            for (int i = 0; i < brokenBlocks.size(); i++) {
-                BlockEntry item = brokenBlocks.get(i);
-                BlockPos pos = item.getPos();
-                BlockAnimationHandler.animateBlock(currentWorld, pos);
+    public static void animateBlockDestroyed(ServerLevel world) {
+        if (!brokenBlocks.isEmpty() && world != null) {
+            for (Map.Entry<BlockPos, BlockState> entry : brokenBlocks.entrySet()) {
+                BlockPos pos = entry.getKey();
+                BlockAnimationHandler.animateBlock(world, pos);
             }
-        }
-    }
-
-    private static class BlockEntry {
-        private final BlockPos pos;
-        private final BlockState state;
-
-        public BlockEntry(BlockPos pos, BlockState state) {
-            this.pos = pos;
-            this.state = state;
-        }
-
-        public BlockPos getPos() {
-            return pos;
-        }
-
-        public BlockState getState() {
-            return state;
         }
     }
 }

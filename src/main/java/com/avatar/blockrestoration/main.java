@@ -1,6 +1,6 @@
 package com.avatar.blockrestoration;
 
-import com.avatar.blockrestoration.server.serverInfo;
+import com.avatar.blockrestoration.server.serve;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -16,7 +16,7 @@ public class main {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new serverInfo());
+        MinecraftForge.EVENT_BUS.register(new serve());
         System.out.println("Mod constructor called");
     }
 

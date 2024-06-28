@@ -11,50 +11,63 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.BlockEvent.BreakEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = main.MODID)
-public class serverInfo {
+public class serve {
     private static ServerLevel currentWorld;
-    private static long currentTime;
-    private static boolean isNight;
-    private static int currentDay;
-    private static int currentHours;
-    private static int currentMinutes;
+    private static boolean isNight = false;
+    private static long currentTime = 0;
+    private static int currentDay = 0;
+    private static int currentHours = 0;
+    private static int currentMinutes = 0;
     private static List<ServerPlayer> currentPlayers = new ArrayList<ServerPlayer>();
     private static List<Mob> currentMobs = new ArrayList<Mob>();
 
+    public static boolean checkPeriod(double seconds) {
+        double divisor = (double) (seconds * 20);
+        return currentTime % divisor == 0;
+    }
+
     @SubscribeEvent
     public static void ticksServer(TickEvent.ServerTickEvent event) {
-
         if (event.phase == TickEvent.Phase.START) {
-            if (currentWorld == null) {
-                System.out.println(Monster.class.arrayType());
-            }
             ServerLevel world = event.getServer().getLevel(Level.OVERWORLD);
             if (world == null)
                 return;
             long time = world.getDayTime();
-            if (time % 20 == 0) {
+            currentTime = time;
+            if (checkPeriod(1)) {
                 currentWorld = world;
             }
-            if (time % 20 * 1 / 10 == 0 && !isNight && currentPlayers != null) {
-                BlockRestorer.restoreBlocks();
+            if (checkPeriod(1) && !isNight) {
+                BlockRestorer.restoreBlocks(world);
             }
-            if (time % 20 * 5 == 0 && currentPlayers != null) {
-                BlockRestorer.BlockBurningCheck();
-                BlockRestorer.setWorld(currentWorld);
-                BlockRestorer.animateBlockDestroyed();
+            if (checkPeriod(4)) {
+                BlockRestorer.animateBlockDestroyed(world);
             }
+            if (checkPeriod(5)) {
+                BlockRestorer.checkBlockStatesAroundTable(world);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPutTable(BlockEvent.EntityPlaceEvent event) {
+        BlockState getPlacedBlock = event.getPlacedBlock();
+        if (getPlacedBlock.getBlock() == Blocks.CRAFTING_TABLE) {
+            System.out.println("A table was placed in the world!");
+            BlockPos tablePos = event.getPos();
+            BlockRestorer.setBlockStatesTable(currentWorld, tablePos);
         }
     }
 
@@ -65,18 +78,27 @@ public class serverInfo {
             for (BlockPos pos : affectedBlocks) {
                 BlockState state = currentWorld.getBlockState(pos);
                 if (state.getBlock() != Blocks.AIR) {
-                    BlockRestorer.addBrokenBlock(pos, state);
+                    // BlockRestorer.addBrokenBlock(pos, state);
                 }
             }
         }
     }
 
     @SubscribeEvent
-    public void onNeighborNotify(BreakEvent event) {
+    public void onPlayerBreak(BreakEvent event) {
         BlockState state = event.getState();
-        System.out.println(state);
-        if (!state.is(Blocks.FIRE) && !state.isAir()) {
-            // BlockRestorer.addBlockBurning(event.getPos(), state);
+        Player player = event.getPlayer();
+        BlockPos position = event.getPos();
+
+        if (player != null) {
+            if (!state.is(Blocks.FIRE) || !state.isAir()) {
+                System.out.println(state);
+                BlockRestorer.addPlayerBrokenBlock(position);
+            }
+        }
+        if (event.getState().getBlock() == Blocks.CRAFTING_TABLE) {
+            System.out.println("A table was removed from the world!");
+            BlockRestorer.removeBlockStatesTable();
         }
     }
 
