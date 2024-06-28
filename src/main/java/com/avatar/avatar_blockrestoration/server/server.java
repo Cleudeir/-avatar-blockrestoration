@@ -1,7 +1,7 @@
-package com.avatar.blockrestoration.server;
+package com.avatar.avatar_blockrestoration.server;
 
-import com.avatar.blockrestoration.main;
-import com.avatar.blockrestoration.function.BlockRestorer;
+import com.avatar.avatar_blockrestoration.main;
+import com.avatar.avatar_blockrestoration.function.BlockRestorer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

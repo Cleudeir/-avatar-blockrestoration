@@ -1,7 +1,7 @@
-package com.avatar.blockrestoration;
+package com.avatar.avatar_blockrestoration;
 
-import com.avatar.blockrestoration.function.BlockRestorerDataHandler;
-import com.avatar.blockrestoration.server.server;
+import com.avatar.avatar_blockrestoration.function.BlockRestorerDataHandler;
+import com.avatar.avatar_blockrestoration.server.server;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -11,7 +11,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(main.MODID)
 public class main {
-    public static final String MODID = "blockrestoration";
+    public static final String MODID = "avatar_blockrestoration";
 
     public main() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);

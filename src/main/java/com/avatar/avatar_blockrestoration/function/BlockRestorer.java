@@ -1,4 +1,4 @@
-package com.avatar.blockrestoration.function;
+package com.avatar.avatar_blockrestoration.function;
 
 import java.util.HashMap;
 import java.util.Iterator;

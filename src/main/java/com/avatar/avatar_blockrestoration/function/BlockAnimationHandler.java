@@ -1,4 +1,4 @@
-package com.avatar.blockrestoration.function;
+package com.avatar.avatar_blockrestoration.function;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
