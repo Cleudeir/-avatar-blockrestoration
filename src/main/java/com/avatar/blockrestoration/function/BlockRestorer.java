@@ -8,21 +8,26 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockRestorer {
-    private static final Map<BlockPos, BlockState> brokenBlocks = new HashMap<>();
-    private static final Map<BlockPos, BlockState> aroundBlocksTable = new HashMap<>();
-    private static final List<BlockPos> playerBrokenBlocks = new ArrayList<>();
+    private static Map<BlockPos, BlockState> brokenBlocks = new HashMap<>();
+    private static Map<BlockPos, BlockState> aroundBlocksTable = new HashMap<>();
+    private static List<BlockPos> playerBrokenBlocks = new ArrayList<>();
 
     static {
-        BlockRestorerDataHandler.loadData(brokenBlocks, aroundBlocksTable, playerBrokenBlocks);
+
+        BlockRestorerDataDTO data = BlockRestorerDataHandler.load();
+        aroundBlocksTable = data.getAroundBlocksTable();
+        brokenBlocks = data.getBrokenBlocks();
+        playerBrokenBlocks = data.getPlayerBrokenBlocks();
     }
 
     private static void saveData() {
-        BlockRestorerDataHandler.saveData(brokenBlocks, aroundBlocksTable, playerBrokenBlocks);
+        BlockRestorerDataHandler
+                .save(new BlockRestorerDataDTO(brokenBlocks, aroundBlocksTable, playerBrokenBlocks));
     }
 
     public static void addBrokenBlock(BlockPos pos, BlockState state) {
         brokenBlocks.put(pos, state);
-        BlockRestorerDataHandler.saveData(brokenBlocks, aroundBlocksTable, playerBrokenBlocks);
+        saveData();
     }
 
     public static void checkBlockStatesAroundTable(ServerLevel world) {
@@ -99,7 +104,7 @@ public class BlockRestorer {
     }
 
     public static void animateBlockDestroyed(ServerLevel world) {
-        if (!brokenBlocks.isEmpty() && world != null) {
+        if (brokenBlocks.size() > 0 && world != null) {
             for (Map.Entry<BlockPos, BlockState> entry : brokenBlocks.entrySet()) {
                 BlockPos pos = entry.getKey();
                 BlockAnimationHandler.animateBlock(world, pos);
