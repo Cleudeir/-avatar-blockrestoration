@@ -43,7 +43,7 @@ public class BlockRestorerDataHandler {
     }
 
     public static void init() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, CONFIG);
     }
 
     // Method to save data

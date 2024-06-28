@@ -2,7 +2,6 @@ package com.avatar.blockrestoration.server;
 
 import com.avatar.blockrestoration.main;
 import com.avatar.blockrestoration.function.BlockRestorer;
-import com.avatar.blockrestoration.function.BlockRestorerDataHandler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -45,9 +44,8 @@ public class server {
                 }
 
                 if (checkPeriod(1) && !isNight) {
-                    BlockRestorer.restoreBlocks(world);
+                    BlockRestorer.restoreBlocksFirst(world);
                 }
-
                 if (checkPeriod(4)) {
                     BlockRestorer.animateBlockDestroyed(world);
                 }
