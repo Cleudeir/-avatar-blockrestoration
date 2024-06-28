@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.antlr.v4.parse.ANTLRParser.id_return;
+
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockRestorerDataDTO {
@@ -24,24 +28,46 @@ public class BlockRestorerDataDTO {
         return brokenBlocks;
     }
 
-    public List<String> getBrokenBlocksListString() {
-        return brokenBlocks.keySet().stream().map(BlockPos::toString).toList();
+    public List<String> getIdListMap(Map<BlockPos, BlockState> list) {
+        List<String> ListBlockPos = new ArrayList<>();
+        for (Map.Entry<BlockPos, BlockState> entry : list.entrySet()) {
+            BlockPos blockPos = entry.getKey();
+            // string x, y, z
+            String stringBlockPos = blockPos.getX() + "," + blockPos.getY() + "," + blockPos.getZ();
+            ListBlockPos.add(stringBlockPos);
+        }
+        return ListBlockPos;
+    }
+
+    public List<String> getIdListList(List<BlockPos> list) {
+        List<String> ListBlockPos = new ArrayList<>();
+        for (BlockPos entry : list) {
+            BlockPos blockPos = entry;
+            // string x, y, z
+            String stringBlockPos = blockPos.getX() + "," + blockPos.getY() + "," + blockPos.getZ();
+            ListBlockPos.add(stringBlockPos);
+        }
+        return ListBlockPos;
+    }
+
+    public List<String> getBrokenBlocksListBlockId() {
+        return getIdListMap(brokenBlocks);
     }
 
     public Map<BlockPos, BlockState> getAroundBlocksTable() {
         return aroundBlocksTable;
     }
 
-    public List<String> getAroundBlocksTableListString() {
-        return aroundBlocksTable.keySet().stream().map(BlockPos::toString).toList();
+    public List<String> getAroundBlocksTableListBlockId() {
+        return getIdListMap(aroundBlocksTable);
     }
 
     public List<BlockPos> getPlayerBrokenBlocks() {
         return playerBrokenBlocks;
     }
 
-    public List<String> getPlayerBrokenBlocksListString() {
-        return playerBrokenBlocks.stream().map(BlockPos::toString).toList();
+    public List<String> getPlayerBrokenBlocksListBlockId() {
+        return getIdListList(playerBrokenBlocks);
     }
 
 }

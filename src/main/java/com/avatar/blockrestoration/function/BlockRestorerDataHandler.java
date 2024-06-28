@@ -7,6 +7,7 @@ import java.util.Map;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -61,23 +62,44 @@ public class BlockRestorerDataHandler {
     // Method to save data
     public static void save(BlockRestorerDataDTO data) {
 
-        List<String> brokenBlocks = data.getBrokenBlocksListString();
-        List<String> aroundBlocksTable = data.getAroundBlocksTableListString();
-        List<String> playerBrokenBlocks = data.getPlayerBrokenBlocksListString();
+        List<String> brokenBlocks = data.getBrokenBlocksListBlockId();
+        List<String> aroundBlocksTable = data.getAroundBlocksTableListBlockId();
+        List<String> playerBrokenBlocks = data.getPlayerBrokenBlocksListBlockId();
 
-        System.out.println(brokenBlocks);
+        System.out.println(aroundBlocksTable);
+        System.out.println(playerBrokenBlocks);
         BROKEN_BLOCKS.set(brokenBlocks);
         AROUND_BLOCKS_TABLE.set(aroundBlocksTable);
         PLAYER_BROKEN_BLOCKS.set(playerBrokenBlocks);
         CONFIG.save();
     }
 
-    private static Map<BlockPos, BlockState> deserializeBlockMap(List<String> serializedList) {
+    private static Map<BlockPos, BlockState> deserializeBlockMap(List<String> MapBlockPos) {
         Map<BlockPos, BlockState> map = new HashMap<>();
-        for (String entry : serializedList) {
-
+        for (String entry : MapBlockPos) {
+            String[] split = entry.split(",");
+            int x = Integer.parseInt(split[0]);
+            int y = Integer.parseInt(split[1]);
+            int z = Integer.parseInt(split[2]);
+            BlockPos blockPos = new BlockPos(x, y, z);
+            ServerLevel world = BlockRestorerDataHandler.currentWorld;
+            BlockState blockState = world.getBlockState(blockPos);
+            map.put(blockPos, blockState);
         }
         return map;
+    }
+
+    private static List<BlockPos> deserializeBlockList(List<String> ListBlockPos) {
+        List<BlockPos> list = new ArrayList<>();
+        for (String entry : ListBlockPos) {
+            String[] split = entry.split(",");
+            int x = Integer.parseInt(split[0]);
+            int y = Integer.parseInt(split[1]);
+            int z = Integer.parseInt(split[2]);
+            BlockPos blockPos = new BlockPos(x, y, z);
+            list.add(blockPos);
+        }
+        return list;
     }
 
     // Method to load data
@@ -91,7 +113,7 @@ public class BlockRestorerDataHandler {
             // Retrieve data from config
             brokenBlocksGet = deserializeBlockMap(BROKEN_BLOCKS.get());
             aroundBlocksTableGet = deserializeBlockMap(AROUND_BLOCKS_TABLE.get());
-            playerBrokenBlocksGet = new ArrayList<>();
+            playerBrokenBlocksGet = deserializeBlockList(PLAYER_BROKEN_BLOCKS.get());
         }
         return new BlockRestorerDataDTO(
                 brokenBlocksGet,
