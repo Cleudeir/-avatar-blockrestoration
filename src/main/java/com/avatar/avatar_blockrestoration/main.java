@@ -1,8 +1,8 @@
 package com.avatar.avatar_blockrestoration;
 
 import com.avatar.avatar_blockrestoration.function.BlockRestorerDataHandler;
-import com.avatar.avatar_blockrestoration.server.globalConfig;
-import com.avatar.avatar_blockrestoration.server.server;
+import com.avatar.avatar_blockrestoration.server.GlobalConfig;
+import com.avatar.avatar_blockrestoration.server.Server;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -18,10 +18,10 @@ public class main {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new server());
+        MinecraftForge.EVENT_BUS.register(new Server());
         System.out.println("Mod constructor called");
         BlockRestorerDataHandler.init();
-        globalConfig.init();
+        GlobalConfig.init();
     }
 
     private void setup(final FMLCommonSetupEvent event) {

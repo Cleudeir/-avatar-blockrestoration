@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 @Mod.EventBusSubscriber(modid = main.MODID)
-public class server {
+public class Server {
     private static ServerLevel currentWorld;
     private static long currentTime = 0;
 
@@ -30,7 +30,7 @@ public class server {
     }
 
     public static Block setDynamicBlock() {
-        String blockName = globalConfig.loadMainBlock();
+        String blockName = GlobalConfig.loadMainBlock();
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName));
         return block;
     }
@@ -101,9 +101,9 @@ public class server {
                 }
             }
         }
-        if (event.getState().getBlock() == setDynamicBlock()) {
+        if (event.getState().getBlock() == setDynamicBlock() && currentWorld != null) {
             System.out.println("A table was removed from the world!");
-            BlockRestorer.removeBlockStatesTable();
+            BlockRestorer.removeBlockStatesTable(currentWorld);
         }
     }
 

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.avatar.avatar_blockrestoration.server.Server;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
@@ -29,6 +31,9 @@ public class BlockRestorer {
     }
 
     public static void checkBlockStatesAroundTable(ServerLevel world) {
+        System.out.println("brokenBlocks" + brokenBlocks.size());
+        System.out.println("aroundBlocksTable " + aroundBlocksTable.size());
+        System.out.println("perimeterBlocksTable " + perimeterBlocksTable.size());
         if (world != null && !aroundBlocksTable.isEmpty()) {
             Iterator<Map.Entry<BlockPos, BlockState>> iterator = aroundBlocksTable.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -52,17 +57,18 @@ public class BlockRestorer {
         BlockState state = world.getBlockState(pos);
         System.out.println(state);
         aroundBlocksTable.put(pos, state);
-        // saveData();
+
     }
 
     public static void updateBreakBlock(BlockPos pos) {
         System.out.println("Player broken blocks");
         aroundBlocksTable.remove(pos);
         brokenBlocks.remove(pos);
-        // saveData();
+
     }
 
     public static void setBlockStatesTable(ServerLevel world, BlockPos tablePos) {
+        removeBlockStatesTable(world);
         int radius = 20;
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
@@ -77,7 +83,6 @@ public class BlockRestorer {
             }
         }
         listAllBlocksInPerimeter(world, tablePos, radius);
-        // saveData();
     }
 
     public static void listAllBlocksInPerimeter(ServerLevel world, BlockPos block, int radius) {
@@ -116,10 +121,16 @@ public class BlockRestorer {
         }
     }
 
-    public static void removeBlockStatesTable() {
+    public static void removeBlockStatesTable(ServerLevel world) {
+        for (BlockPos pos : aroundBlocksTable.keySet()) {
+            BlockState blockState = aroundBlocksTable.get(pos);
+            if (blockState.getBlock() == Server.setDynamicBlock()) {
+                world.destroyBlock(pos, false);
+                break;
+            }
+        }
         aroundBlocksTable.clear();
         perimeterBlocksTable.clear();
-        // saveData();
     }
 
     public static void restoreBlocksFirst(ServerLevel world) {
