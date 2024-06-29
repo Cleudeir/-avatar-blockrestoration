@@ -16,7 +16,7 @@ public class globalConfig {
         BUILDER.comment("Broken Blocks Data").push("brokenBlocks");
         MAIN_BLOCK = BUILDER
                 .comment("Default broken blocks data")
-                .define("default", "minecraft:crafting_table");
+                .define("default", "minecraft:black_banner");
         BUILDER.pop();
         CONFIG = BUILDER.build();
     }
@@ -32,7 +32,7 @@ public class globalConfig {
 
     // Method to load data
     public static String loadMainBlock() {
-        String mainBlock = "minecraft:crafting_table";
+        String mainBlock = "minecraft:black_banner";
         if (CONFIG.isLoaded()) {
             mainBlock = MAIN_BLOCK.get();
         }

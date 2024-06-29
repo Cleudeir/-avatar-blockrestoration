@@ -21,4 +21,16 @@ public class BlockAnimationHandler {
         }
     }
 
+    public static void animatePerimeter(ServerLevel world, BlockPos animationPos) {
+        world.sendParticles(ParticleTypes.ENCHANT,
+                animationPos.getX() + 0.5,
+                animationPos.getY() + 0.5,
+                animationPos.getZ() + 0.5,
+                3,
+                0.2,
+                0.2,
+                0.2,
+                0.05);
+    }
+
 }
