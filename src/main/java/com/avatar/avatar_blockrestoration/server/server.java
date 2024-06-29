@@ -51,13 +51,13 @@ public class server {
                 if (checkPeriod(1)) {
                     currentWorld = world;
                 }
-                if (checkPeriod(37) && !isNight) {
+                if (checkPeriod(10) && !isNight) {
                     BlockRestorer.restoreBlocksFirst(world);
                 }
                 if (checkPeriod(3)) {
                     BlockRestorer.animates(world);
                 }
-                if (checkPeriod(29)) {
+                if (checkPeriod(15)) {
                     BlockRestorer.checkBlockStatesAroundTable(world);
                 }
             }
