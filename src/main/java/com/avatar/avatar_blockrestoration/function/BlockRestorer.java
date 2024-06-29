@@ -20,11 +20,12 @@ public class BlockRestorer {
         BlockRestorerDataDTO data = BlockRestorerDataHandler.load(world);
         aroundBlocksTable = data.getAroundBlocksTable();
         brokenBlocks = data.getBrokenBlocks();
+        perimeterBlocksTable = data.getPerimeterBlocksTable();
     }
 
     public static void saveData() {
         BlockRestorerDataHandler
-                .save(new BlockRestorerDataDTO(brokenBlocks, aroundBlocksTable));
+                .save(new BlockRestorerDataDTO(brokenBlocks, aroundBlocksTable, perimeterBlocksTable));
     }
 
     public static void checkBlockStatesAroundTable(ServerLevel world) {

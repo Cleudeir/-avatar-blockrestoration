@@ -20,7 +20,7 @@ public class BlockRestorerDataHandler {
     // Define your config values here
     public static ForgeConfigSpec.ConfigValue<List<String>> BROKEN_BLOCKS;
     public static ForgeConfigSpec.ConfigValue<List<String>> AROUND_BLOCKS_TABLE;
-
+    public static ForgeConfigSpec.ConfigValue<List<String>> PERIMETER_BLOCKS_TABLE;
     // Initialize config values without static initializer block
     static {
         setupConfig();
@@ -39,6 +39,12 @@ public class BlockRestorerDataHandler {
                 .define("default", new ArrayList<String>());
         BUILDER.pop();
 
+        BUILDER.comment("Perimeter Blocks Table Data").push("perimeterBlocksTable");
+        PERIMETER_BLOCKS_TABLE = BUILDER
+                .comment("Default perimeter blocks table data")
+                .define("default", new ArrayList<String>());
+        BUILDER.pop();
+
         CONFIG = BUILDER.build();
     }
 
@@ -50,8 +56,10 @@ public class BlockRestorerDataHandler {
     public static void save(BlockRestorerDataDTO data) {
         List<String> brokenBlocks = data.getBrokenBlocksListBlockId();
         List<String> aroundBlocksTable = data.getAroundBlocksTableListBlockId();
+        List<String> perimeterBlocksTable = data.getPerimeterBlocksTableListBlockId();
         BROKEN_BLOCKS.set(brokenBlocks);
         AROUND_BLOCKS_TABLE.set(aroundBlocksTable);
+        PERIMETER_BLOCKS_TABLE.set(perimeterBlocksTable);
         CONFIG.save();
     }
 
@@ -75,15 +83,17 @@ public class BlockRestorerDataHandler {
         // Load the config if not already loaded
         Map<BlockPos, BlockState> brokenBlocksGet = new HashMap<>();
         Map<BlockPos, BlockState> aroundBlocksTableGet = new HashMap<>();
-
+        Map<BlockPos, BlockState> perimeterBlocksTable = new HashMap<>();
         if (CONFIG.isLoaded()) {
             // Retrieve data from config
             brokenBlocksGet = deserializeBlockMap(BROKEN_BLOCKS.get(), world);
             aroundBlocksTableGet = deserializeBlockMap(AROUND_BLOCKS_TABLE.get(), world);
+            perimeterBlocksTable = deserializeBlockMap(PERIMETER_BLOCKS_TABLE.get(), world);
             System.out.println("Data loaded from config");
         }
         return new BlockRestorerDataDTO(
                 brokenBlocksGet,
-                aroundBlocksTableGet);
+                aroundBlocksTableGet,
+                perimeterBlocksTable);
     }
 }

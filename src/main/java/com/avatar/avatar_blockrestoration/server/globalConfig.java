@@ -15,7 +15,7 @@ public class globalConfig {
     private static void setupConfig() {
         BUILDER.comment("Broken Blocks Data").push("brokenBlocks");
         MAIN_BLOCK = BUILDER
-                .comment("Default broken blocks data")
+                .comment("Default block get effect restore")
                 .define("default", "minecraft:black_banner");
         BUILDER.pop();
         CONFIG = BUILDER.build();
