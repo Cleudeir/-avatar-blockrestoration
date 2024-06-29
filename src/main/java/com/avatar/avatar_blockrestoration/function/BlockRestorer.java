@@ -76,7 +76,7 @@ public class BlockRestorer {
             }
         }
         listAllBlocksInPerimeter(world, tablePos, radius);
-        saveData();
+        // saveData();
     }
 
     public static void listAllBlocksInPerimeter(ServerLevel world, BlockPos block, int radius) {
@@ -84,7 +84,7 @@ public class BlockRestorer {
         for (int i = -radius; i <= radius; i++) {
             int x = block.getX() + i;
             int z = block.getZ() + radius;
-            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z);
+            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 1;
             BlockPos currentPos = new BlockPos(x, y, z);
             BlockState blockState = world.getBlockState(currentPos);
             perimeterBlocksTable.put(currentPos, blockState);
@@ -92,7 +92,7 @@ public class BlockRestorer {
         for (int i = -radius; i <= radius; i++) {
             int x = block.getX() + i;
             int z = block.getZ() - radius;
-            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z);
+            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 1;
             BlockPos currentPos = new BlockPos(x, y, z);
             BlockState blockState = world.getBlockState(currentPos);
             perimeterBlocksTable.put(currentPos, blockState);
@@ -100,7 +100,7 @@ public class BlockRestorer {
         for (int i = -radius; i <= radius; i++) {
             int x = block.getX() + radius;
             int z = block.getZ() + i;
-            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z);
+            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 1;
             BlockPos currentPos = new BlockPos(x, y, z);
             BlockState blockState = world.getBlockState(currentPos);
             perimeterBlocksTable.put(currentPos, blockState);
@@ -108,7 +108,7 @@ public class BlockRestorer {
         for (int i = -radius; i <= radius; i++) {
             int x = block.getX() - radius;
             int z = block.getZ() + i;
-            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z);
+            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 1;
             BlockPos currentPos = new BlockPos(x, y, z);
             BlockState blockState = world.getBlockState(currentPos);
             perimeterBlocksTable.put(currentPos, blockState);
@@ -118,7 +118,7 @@ public class BlockRestorer {
     public static void removeBlockStatesTable() {
         aroundBlocksTable.clear();
         perimeterBlocksTable.clear();
-        saveData();
+        // saveData();
     }
 
     public static void restoreBlocksFirst(ServerLevel world) {
@@ -143,7 +143,6 @@ public class BlockRestorer {
                 }
             }
         }
-        saveData();
     }
 
     public static void animates(ServerLevel world) {

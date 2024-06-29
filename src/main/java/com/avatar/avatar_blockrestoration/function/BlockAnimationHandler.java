@@ -26,11 +26,11 @@ public class BlockAnimationHandler {
                 animationPos.getX() + 0.5,
                 animationPos.getY() + 0.5,
                 animationPos.getZ() + 0.5,
-                3,
+                10,
                 0.2,
                 0.2,
                 0.2,
-                0.05);
+                0.1);
     }
 
 }
