@@ -1,6 +1,7 @@
 package com.avatar.avatar_blockrestoration;
 
 import com.avatar.avatar_blockrestoration.function.BlockRestorerDataHandler;
+import com.avatar.avatar_blockrestoration.server.globalConfig;
 import com.avatar.avatar_blockrestoration.server.server;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -20,6 +21,7 @@ public class main {
         MinecraftForge.EVENT_BUS.register(new server());
         System.out.println("Mod constructor called");
         BlockRestorerDataHandler.init();
+        globalConfig.init();
     }
 
     private void setup(final FMLCommonSetupEvent event) {

@@ -28,7 +28,8 @@ public class server {
         return currentTime % divisor == 0;
     }
 
-    public static Block setDynamicBlock(String blockName) {
+    public static Block setDynamicBlock() {
+        String blockName = globalConfig.loadMainBlock();
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName));
         return block;
     }
@@ -50,7 +51,6 @@ public class server {
                 if (checkPeriod(1)) {
                     currentWorld = world;
                 }
-
                 if (checkPeriod(1) && !isNight) {
                     BlockRestorer.restoreBlocksFirst(world);
                 }
@@ -67,7 +67,7 @@ public class server {
     @SubscribeEvent
     public static void onPutTable(BlockEvent.EntityPlaceEvent event) {
         BlockState getPlacedBlock = event.getPlacedBlock();
-        if (getPlacedBlock.getBlock() == setDynamicBlock("minecraft:crafting_table")) {
+        if (getPlacedBlock.getBlock() == setDynamicBlock()) {
             System.out.println("A table was placed in the world!");
             BlockPos tablePos = event.getPos();
             BlockRestorer.setBlockStatesTable(currentWorld, tablePos);
@@ -93,7 +93,7 @@ public class server {
                 }
             }
         }
-        if (event.getState().getBlock() == setDynamicBlock("minecraft:crafting_table")) {
+        if (event.getState().getBlock() == setDynamicBlock()) {
             System.out.println("A table was removed from the world!");
             BlockRestorer.removeBlockStatesTable();
         }
