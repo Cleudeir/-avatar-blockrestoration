@@ -62,8 +62,8 @@ public class Events {
         BlockState getPlacedBlock = event.getPlacedBlock();
         if (getPlacedBlock.getBlock() == GlobalConfig.loadMainBlock()) {
             System.out.println("A table was placed in the world!");
-            BlockPos tablePos = event.getPos();
-            BlockRestorer.setBlockStatesAroundTable(currentWorld, tablePos);
+            BlockPos mainPos = event.getPos();
+            BlockRestorer.setBlockStatesAroundTable(currentWorld, mainPos);
             BlockRestorer.getAnimate(currentWorld);
         } else {
             System.out.println("put block" + getPlacedBlock.toString());

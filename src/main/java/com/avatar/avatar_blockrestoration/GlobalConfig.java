@@ -27,7 +27,7 @@ public class GlobalConfig {
         BUILDER.comment("Around main block radius scan").push("radiusScan");
         RADIUS_SCAN = BUILDER
                 .comment("Default radius scan")
-                .define("default", "10");
+                .define("default", "20");
         BUILDER.pop();
         CONFIG = BUILDER.build();
     }

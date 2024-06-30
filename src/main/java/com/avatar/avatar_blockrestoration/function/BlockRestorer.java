@@ -6,8 +6,6 @@ import java.util.Map;
 
 import com.avatar.avatar_blockrestoration.GlobalConfig;
 import com.avatar.avatar_blockrestoration.animation.Animate;
-import com.avatar.avatar_blockrestoration.dto.BlockRestorerDataDTO;
-import com.avatar.avatar_blockrestoration.server.Events;
 import com.avatar.avatar_blockrestoration.server.ServerConfig;
 
 import net.minecraft.core.BlockPos;
@@ -21,17 +19,18 @@ public class BlockRestorer {
     private static Map<BlockPos, BlockState> brokenBlocks = new HashMap<>();
     private static Map<BlockPos, BlockState> aroundBlocksTable = new HashMap<>();
     private static Map<BlockPos, BlockState> perimeterBlocksTable = new HashMap<>();
+    private static BlockPos mainBlockPos;
 
     public static void start(ServerLevel world) {
-        BlockRestorerDataDTO data = ServerConfig.load(world);
-        aroundBlocksTable = data.getAroundBlocksTable();
-        brokenBlocks = data.getBrokenBlocks();
-        perimeterBlocksTable = data.getPerimeterBlocksTable();
+        aroundBlocksTable = ServerConfig.loadAroundMainBlock(world);
+        brokenBlocks = ServerConfig.loadBrokenBlocks(world);
+        perimeterBlocksTable = ServerConfig.loadPerimeterMainBlock(world);
+        mainBlockPos = ServerConfig.loadMainBlockPos(world);
     }
 
     public static void saveData() {
         ServerConfig
-                .save(new BlockRestorerDataDTO(brokenBlocks, aroundBlocksTable, perimeterBlocksTable));
+                .save(brokenBlocks, aroundBlocksTable, perimeterBlocksTable, mainBlockPos);
     }
 
     public static void checkBlockStatesAroundTable(ServerLevel world) {
@@ -72,13 +71,14 @@ public class BlockRestorer {
         }
     }
 
-    public static void setBlockStatesAroundTable(ServerLevel world, BlockPos tablePos) {
+    public static void setBlockStatesAroundTable(ServerLevel world, BlockPos mainPos) {
         removeBlockAroundTable(world);
+        mainBlockPos = mainPos;
         int radius = GlobalConfig.loadRadiusBlock();
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
-                    BlockPos currentPos = tablePos.offset(x, y, z);
+                    BlockPos currentPos = mainPos.offset(x, y, z);
                     BlockState blockState = world.getBlockState(currentPos);
                     if (!blockState.is(Blocks.FIRE) && !blockState.is(Blocks.AIR)
                             && !aroundBlocksTable.containsKey(currentPos)) {
@@ -87,7 +87,7 @@ public class BlockRestorer {
                 }
             }
         }
-        getPerimeterBlocks(world, tablePos, radius);
+        getPerimeterBlocks(world, mainPos, radius);
     }
 
     public static void getPerimeterBlocks(ServerLevel world, BlockPos block, int radius) {
@@ -127,13 +127,7 @@ public class BlockRestorer {
     }
 
     public static void removeBlockAroundTable(ServerLevel world) {
-        for (BlockPos pos : aroundBlocksTable.keySet()) {
-            BlockState blockState = aroundBlocksTable.get(pos);
-            if (blockState.getBlock() == GlobalConfig.loadMainBlock()) {
-                world.destroyBlock(pos, false);
-                break;
-            }
-        }
+        world.destroyBlock(mainBlockPos, false);
         aroundBlocksTable.clear();
         perimeterBlocksTable.clear();
     }
