@@ -36,7 +36,6 @@ public class BlockRestorer {
     public static void checkBlockStatesAroundTable(ServerLevel world) {
         System.out.println("brokenBlocks" + brokenBlocks.size());
         System.out.println("aroundBlocksTable " + aroundBlocksTable.size());
-        System.out.println("perimeterBlocksTable " + perimeterBlocksTable.size());
         if (world != null && !aroundBlocksTable.isEmpty()) {
             Iterator<Map.Entry<BlockPos, BlockState>> iterator = aroundBlocksTable.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -54,8 +53,25 @@ public class BlockRestorer {
         }
     }
 
+    private static boolean checkActionInsideVolumeSafe(BlockPos pos) {
+        int radius = GlobalConfig.loadRadiusBlock();
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        int minPosX = mainBlockPos.getX() - radius;
+        int maxPosX = mainBlockPos.getX() + radius;
+        int minPosY = mainBlockPos.getY() - radius;
+        int maxPosY = mainBlockPos.getY() + radius;
+        int minPosZ = mainBlockPos.getZ() - radius;
+        int maxPosZ = mainBlockPos.getZ() + radius;
+        if (x >= minPosX && x <= maxPosX && y >= -minPosY && y <= maxPosY && z >= -minPosZ && z <= maxPosZ) {
+            return true;
+        }
+        return false;
+    }
+
     public static void updatePutBlockAroundBlocks(ServerLevel world, BlockPos pos) {
-        if (aroundBlocksTable.containsKey(pos)) {
+        if (checkActionInsideVolumeSafe(pos)) {
             System.out.println("Player put blocks in safe area");
             BlockState state = world.getBlockState(pos);
             brokenBlocks.remove(pos);
@@ -64,8 +80,8 @@ public class BlockRestorer {
     }
 
     public static void updatePlayerBreakBlockAroundBlocks(BlockPos pos) {
-        if (aroundBlocksTable.containsKey(pos)) {
-            System.out.println("Player broken blocks");
+        if (checkActionInsideVolumeSafe(pos)) {
+            System.out.println("Player broken blocks in safe area");
             aroundBlocksTable.remove(pos);
             brokenBlocks.remove(pos);
         }

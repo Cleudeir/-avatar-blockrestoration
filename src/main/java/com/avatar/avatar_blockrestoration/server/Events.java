@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.TickEvent;
@@ -66,7 +65,7 @@ public class Events {
             BlockRestorer.setBlockStatesAroundTable(currentWorld, mainPos);
             BlockRestorer.getAnimate(currentWorld);
         } else {
-            System.out.println("put block" + getPlacedBlock.toString());
+            System.out.println("Player put block" + getPlacedBlock.toString());
             BlockPos blockPos = event.getPos();
             if (currentWorld != null) {
                 BlockRestorer.updatePutBlockAroundBlocks(currentWorld, blockPos);
