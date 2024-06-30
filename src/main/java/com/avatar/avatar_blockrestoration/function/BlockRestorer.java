@@ -34,7 +34,7 @@ public class BlockRestorer {
     }
 
     public static void checkBlockStatesAroundMainBlock(ServerLevel world) {
-        System.out.println("brokenBlocks" + brokenBlocks.size());
+        System.out.println("brokenBlocks " + brokenBlocks.size());
         System.out.println("aroundBlocksMainBlock " + aroundBlocksMainBlock.size());
         if (world != null && !aroundBlocksMainBlock.isEmpty()) {
             Iterator<Map.Entry<BlockPos, BlockState>> iterator = aroundBlocksMainBlock.entrySet().iterator();
