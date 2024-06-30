@@ -1,4 +1,4 @@
-package com.avatar.avatar_blockrestoration.function;
+package com.avatar.avatar_blockrestoration.dto;
 
 import java.util.ArrayList;
 import java.util.HashMap;

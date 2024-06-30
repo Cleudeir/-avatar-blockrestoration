@@ -1,10 +1,10 @@
 package com.avatar.avatar_blockrestoration.server;
 
-import com.avatar.avatar_blockrestoration.main;
+import com.avatar.avatar_blockrestoration.GlobalConfig;
+import com.avatar.avatar_blockrestoration.Main;
 import com.avatar.avatar_blockrestoration.function.BlockRestorer;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -17,22 +17,15 @@ import net.minecraftforge.event.level.BlockEvent.BreakEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 
-@Mod.EventBusSubscriber(modid = main.MODID)
-public class Server {
+@Mod.EventBusSubscriber(modid = Main.MODID)
+public class Events {
     private static ServerLevel currentWorld;
     private static long currentTime = 0;
 
     public static boolean checkPeriod(double seconds) {
         double divisor = (double) (seconds * 20);
         return currentTime % divisor == 0;
-    }
-
-    public static Block setDynamicBlock() {
-        String blockName = GlobalConfig.loadMainBlock();
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName));
-        return block;
     }
 
     @SubscribeEvent
@@ -52,10 +45,10 @@ public class Server {
                     currentWorld = world;
                 }
                 if (checkPeriod(10) && !isNight) {
-                    BlockRestorer.restoreBlocksFirst(world);
+                    BlockRestorer.getRestoreBlocks(world);
                 }
                 if (checkPeriod(3)) {
-                    BlockRestorer.animates(world);
+                    BlockRestorer.getAnimate(world);
                 }
                 if (checkPeriod(15)) {
                     BlockRestorer.checkBlockStatesAroundTable(world);
@@ -67,16 +60,16 @@ public class Server {
     @SubscribeEvent
     public static void onPutTable(BlockEvent.EntityPlaceEvent event) {
         BlockState getPlacedBlock = event.getPlacedBlock();
-        if (getPlacedBlock.getBlock() == setDynamicBlock()) {
+        if (getPlacedBlock.getBlock() == GlobalConfig.loadMainBlock()) {
             System.out.println("A table was placed in the world!");
             BlockPos tablePos = event.getPos();
-            BlockRestorer.setBlockStatesTable(currentWorld, tablePos);
-            BlockRestorer.animates(currentWorld);
+            BlockRestorer.setBlockStatesAroundTable(currentWorld, tablePos);
+            BlockRestorer.getAnimate(currentWorld);
         } else {
             System.out.println("put block" + getPlacedBlock.toString());
             BlockPos blockPos = event.getPos();
             if (currentWorld != null) {
-                BlockRestorer.updateBlock(currentWorld, blockPos);
+                BlockRestorer.updatePutBlockAroundBlocks(currentWorld, blockPos);
             }
         }
     }
@@ -85,7 +78,6 @@ public class Server {
     public static void onServerShutdown(ServerStoppingEvent event) {
         System.out.println("Server is shutting down!");
         BlockRestorer.saveData();
-        // Add logic for handling server shutdown here
     }
 
     @SubscribeEvent
@@ -97,13 +89,13 @@ public class Server {
         if (player != null) {
             if (!state.is(Blocks.FIRE) || !state.isAir()) {
                 if (currentWorld != null) {
-                    BlockRestorer.updateBreakBlock(position);
+                    BlockRestorer.updatePlayerBreakBlockAroundBlocks(position);
                 }
             }
         }
-        if (event.getState().getBlock() == setDynamicBlock() && currentWorld != null) {
+        if (event.getState().getBlock() == GlobalConfig.loadMainBlock() && currentWorld != null) {
             System.out.println("A table was removed from the world!");
-            BlockRestorer.removeBlockStatesTable(currentWorld);
+            BlockRestorer.removeBlockAroundTable(currentWorld);
         }
     }
 

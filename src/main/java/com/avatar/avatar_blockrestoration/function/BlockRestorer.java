@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.avatar.avatar_blockrestoration.server.Server;
+import com.avatar.avatar_blockrestoration.GlobalConfig;
+import com.avatar.avatar_blockrestoration.animation.Animate;
+import com.avatar.avatar_blockrestoration.dto.BlockRestorerDataDTO;
+import com.avatar.avatar_blockrestoration.server.Events;
+import com.avatar.avatar_blockrestoration.server.ServerConfig;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -19,14 +23,14 @@ public class BlockRestorer {
     private static Map<BlockPos, BlockState> perimeterBlocksTable = new HashMap<>();
 
     public static void start(ServerLevel world) {
-        BlockRestorerDataDTO data = BlockRestorerDataHandler.load(world);
+        BlockRestorerDataDTO data = ServerConfig.load(world);
         aroundBlocksTable = data.getAroundBlocksTable();
         brokenBlocks = data.getBrokenBlocks();
         perimeterBlocksTable = data.getPerimeterBlocksTable();
     }
 
     public static void saveData() {
-        BlockRestorerDataHandler
+        ServerConfig
                 .save(new BlockRestorerDataDTO(brokenBlocks, aroundBlocksTable, perimeterBlocksTable));
     }
 
@@ -51,25 +55,26 @@ public class BlockRestorer {
         }
     }
 
-    public static void updateBlock(ServerLevel world, BlockPos pos) {
-        System.out.println("Player put blocks");
-        brokenBlocks.remove(pos);
-        BlockState state = world.getBlockState(pos);
-        System.out.println(state);
-        aroundBlocksTable.put(pos, state);
-
+    public static void updatePutBlockAroundBlocks(ServerLevel world, BlockPos pos) {
+        if (aroundBlocksTable.containsKey(pos)) {
+            System.out.println("Player put blocks in safe area");
+            BlockState state = world.getBlockState(pos);
+            brokenBlocks.remove(pos);
+            aroundBlocksTable.put(pos, state);
+        }
     }
 
-    public static void updateBreakBlock(BlockPos pos) {
-        System.out.println("Player broken blocks");
-        aroundBlocksTable.remove(pos);
-        brokenBlocks.remove(pos);
-
+    public static void updatePlayerBreakBlockAroundBlocks(BlockPos pos) {
+        if (aroundBlocksTable.containsKey(pos)) {
+            System.out.println("Player broken blocks");
+            aroundBlocksTable.remove(pos);
+            brokenBlocks.remove(pos);
+        }
     }
 
-    public static void setBlockStatesTable(ServerLevel world, BlockPos tablePos) {
-        removeBlockStatesTable(world);
-        int radius = 20;
+    public static void setBlockStatesAroundTable(ServerLevel world, BlockPos tablePos) {
+        removeBlockAroundTable(world);
+        int radius = GlobalConfig.loadRadiusBlock();
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
@@ -82,15 +87,15 @@ public class BlockRestorer {
                 }
             }
         }
-        listAllBlocksInPerimeter(world, tablePos, radius);
+        getPerimeterBlocks(world, tablePos, radius);
     }
 
-    public static void listAllBlocksInPerimeter(ServerLevel world, BlockPos block, int radius) {
+    public static void getPerimeterBlocks(ServerLevel world, BlockPos block, int radius) {
         System.out.println("Listing all blocks in perimeter:");
         for (int i = -radius; i <= radius; i++) {
             int x = block.getX() + i;
             int z = block.getZ() + radius;
-            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 1;
+            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 2;
             BlockPos currentPos = new BlockPos(x, y, z);
             BlockState blockState = world.getBlockState(currentPos);
             perimeterBlocksTable.put(currentPos, blockState);
@@ -98,7 +103,7 @@ public class BlockRestorer {
         for (int i = -radius; i <= radius; i++) {
             int x = block.getX() + i;
             int z = block.getZ() - radius;
-            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 1;
+            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 2;
             BlockPos currentPos = new BlockPos(x, y, z);
             BlockState blockState = world.getBlockState(currentPos);
             perimeterBlocksTable.put(currentPos, blockState);
@@ -106,7 +111,7 @@ public class BlockRestorer {
         for (int i = -radius; i <= radius; i++) {
             int x = block.getX() + radius;
             int z = block.getZ() + i;
-            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 1;
+            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 2;
             BlockPos currentPos = new BlockPos(x, y, z);
             BlockState blockState = world.getBlockState(currentPos);
             perimeterBlocksTable.put(currentPos, blockState);
@@ -114,17 +119,17 @@ public class BlockRestorer {
         for (int i = -radius; i <= radius; i++) {
             int x = block.getX() - radius;
             int z = block.getZ() + i;
-            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 1;
+            int y = (int) world.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) x, (int) z) + 2;
             BlockPos currentPos = new BlockPos(x, y, z);
             BlockState blockState = world.getBlockState(currentPos);
             perimeterBlocksTable.put(currentPos, blockState);
         }
     }
 
-    public static void removeBlockStatesTable(ServerLevel world) {
+    public static void removeBlockAroundTable(ServerLevel world) {
         for (BlockPos pos : aroundBlocksTable.keySet()) {
             BlockState blockState = aroundBlocksTable.get(pos);
-            if (blockState.getBlock() == Server.setDynamicBlock()) {
+            if (blockState.getBlock() == GlobalConfig.loadMainBlock()) {
                 world.destroyBlock(pos, false);
                 break;
             }
@@ -133,7 +138,7 @@ public class BlockRestorer {
         perimeterBlocksTable.clear();
     }
 
-    public static void restoreBlocksFirst(ServerLevel world) {
+    public static void getRestoreBlocks(ServerLevel world) {
         if (world != null && !brokenBlocks.isEmpty()) {
             Iterator<Map.Entry<BlockPos, BlockState>> iterator = brokenBlocks.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -157,17 +162,17 @@ public class BlockRestorer {
         }
     }
 
-    public static void animates(ServerLevel world) {
+    public static void getAnimate(ServerLevel world) {
         if (brokenBlocks.size() > 0 && world != null) {
             for (Map.Entry<BlockPos, BlockState> entry : brokenBlocks.entrySet()) {
                 BlockPos pos = entry.getKey();
-                BlockAnimationHandler.animateBlock(world, pos);
+                Animate.destroyedBlocks(world, pos);
             }
         }
         if (perimeterBlocksTable.size() > 0 && world != null) {
             for (Map.Entry<BlockPos, BlockState> entry : perimeterBlocksTable.entrySet()) {
                 BlockPos pos = entry.getKey();
-                BlockAnimationHandler.animatePerimeter(world, pos);
+                Animate.perimeter(world, pos);
             }
         }
     }
