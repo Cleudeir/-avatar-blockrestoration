@@ -50,19 +50,19 @@ public class Events {
                     BlockRestorer.getAnimate(world);
                 }
                 if (checkPeriod(15)) {
-                    BlockRestorer.checkBlockStatesAroundTable(world);
+                    BlockRestorer.checkBlockStatesAroundMainBlock(world);
                 }
             }
         }
     }
 
     @SubscribeEvent
-    public static void onPutTable(BlockEvent.EntityPlaceEvent event) {
+    public static void onPutMainBlock(BlockEvent.EntityPlaceEvent event) {
         BlockState getPlacedBlock = event.getPlacedBlock();
         if (getPlacedBlock.getBlock() == GlobalConfig.loadMainBlock()) {
             System.out.println("A table was placed in the world!");
             BlockPos mainPos = event.getPos();
-            BlockRestorer.setBlockStatesAroundTable(currentWorld, mainPos);
+            BlockRestorer.setBlockStatesAroundMainBlock(currentWorld, mainPos);
             BlockRestorer.getAnimate(currentWorld);
         } else {
             System.out.println("Player put block" + getPlacedBlock.toString());
@@ -94,7 +94,7 @@ public class Events {
         }
         if (event.getState().getBlock() == GlobalConfig.loadMainBlock() && currentWorld != null) {
             System.out.println("A table was removed from the world!");
-            BlockRestorer.removeBlockAroundTable(currentWorld);
+            BlockRestorer.removeBlockAroundMainBlock(currentWorld);
         }
     }
 

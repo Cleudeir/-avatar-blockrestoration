@@ -34,13 +34,13 @@ public class ServerConfig {
                 .define("default", new ArrayList<String>());
         BUILDER.pop();
 
-        BUILDER.comment("Around Blocks Table Data").push("aroundBlocksTable");
+        BUILDER.comment("Around Blocks MainBlock Data").push("aroundBlocksMainBlock");
         AROUND_BLOCKS = BUILDER
                 .comment("Default around blocks table data")
                 .define("default", new ArrayList<String>());
         BUILDER.pop();
 
-        BUILDER.comment("Perimeter Blocks Table Data").push("perimeterBlocksTable");
+        BUILDER.comment("Perimeter Blocks MainBlock Data").push("perimeterBlocksMainBlock");
         PERIMETER_BLOCKS = BUILDER
                 .comment("Default perimeter blocks table data")
                 .define("default", new ArrayList<String>());
@@ -94,16 +94,16 @@ public class ServerConfig {
 
     // Method to save data
     public static void save(Map<BlockPos, BlockState> brokenBlocks,
-            Map<BlockPos, BlockState> aroundBlocksTable,
-            Map<BlockPos, BlockState> perimeterBlocksTable,
+            Map<BlockPos, BlockState> aroundBlocksMainBlock,
+            Map<BlockPos, BlockState> perimeterBlocksMainBlock,
             BlockPos mainBlockPos) {
         List<String> brokenBlocksString = serializeBlockPosMap(brokenBlocks);
-        List<String> aroundBlocksTableString = serializeBlockPosMap(aroundBlocksTable);
-        List<String> perimeterBlocksTableString = serializeBlockPosMap(perimeterBlocksTable);
+        List<String> aroundBlocksMainBlockString = serializeBlockPosMap(aroundBlocksMainBlock);
+        List<String> perimeterBlocksMainBlockString = serializeBlockPosMap(perimeterBlocksMainBlock);
         String mainBlockPosString = mainBlockPos.getX() + "," + mainBlockPos.getY() + "," + mainBlockPos.getZ();
         BROKEN_BLOCKS.set(brokenBlocksString);
-        AROUND_BLOCKS.set(aroundBlocksTableString);
-        PERIMETER_BLOCKS.set(perimeterBlocksTableString);
+        AROUND_BLOCKS.set(aroundBlocksMainBlockString);
+        PERIMETER_BLOCKS.set(perimeterBlocksMainBlockString);
         MAIN_BLOCK_POS.set(mainBlockPosString);
         CONFIG.save();
     }
@@ -122,13 +122,13 @@ public class ServerConfig {
 
     public static Map<BlockPos, BlockState> loadAroundMainBlock(ServerLevel world) {
         // Load the config if not already loaded
-        Map<BlockPos, BlockState> aroundBlocksTableGet = new HashMap<>();
+        Map<BlockPos, BlockState> aroundBlocksMainBlockGet = new HashMap<>();
         if (CONFIG.isLoaded()) {
             // Retrieve data from config
-            aroundBlocksTableGet = deserializeBlockPosMap(AROUND_BLOCKS.get(), world);
+            aroundBlocksMainBlockGet = deserializeBlockPosMap(AROUND_BLOCKS.get(), world);
             System.out.println("Data loaded from config");
         }
-        return aroundBlocksTableGet;
+        return aroundBlocksMainBlockGet;
     }
 
     public static Map<BlockPos, BlockState> loadPerimeterMainBlock(ServerLevel world) {
