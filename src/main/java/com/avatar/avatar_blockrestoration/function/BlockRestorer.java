@@ -10,22 +10,26 @@ import com.avatar.avatar_blockrestoration.server.ServerConfig;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.util.FakePlayerFactory;
 
 public class BlockRestorer {
     private static Map<BlockPos, BlockState> brokenBlocks = new HashMap<>();
     private static Map<BlockPos, BlockState> aroundBlocksMainBlock = new HashMap<>();
     private static Map<BlockPos, BlockState> perimeterBlocksMainBlock = new HashMap<>();
     private static BlockPos mainBlockPos;
+    private static Block mainBlock;
 
     public static void start(ServerLevel world) {
         aroundBlocksMainBlock = ServerConfig.loadAroundMainBlock(world);
         brokenBlocks = ServerConfig.loadBrokenBlocks(world);
         perimeterBlocksMainBlock = ServerConfig.loadPerimeterMainBlock(world);
         mainBlockPos = ServerConfig.loadMainBlockPos(world);
+        mainBlock = GlobalConfig.loadMainBlock();
     }
 
     public static void saveData() {
@@ -34,6 +38,11 @@ public class BlockRestorer {
     }
 
     public static void checkBlockStatesAroundMainBlock(ServerLevel world) {
+        BlockState blockStateMain = world.getBlockState(mainBlockPos);
+        if (blockStateMain.is(Blocks.AIR)) {
+            aroundBlocksMainBlock.clear();
+            perimeterBlocksMainBlock.clear();
+        }
         System.out.println("brokenBlocks " + brokenBlocks.size());
         System.out.println("aroundBlocksMainBlock " + aroundBlocksMainBlock.size());
         if (world != null && !aroundBlocksMainBlock.isEmpty()) {
@@ -88,8 +97,8 @@ public class BlockRestorer {
     }
 
     public static void setBlockStatesAroundMainBlock(ServerLevel world, BlockPos mainPos) {
-        removeBlockAroundMainBlock(world);
-        mainBlockPos = mainPos;
+        removeBlockAroundMainBlock(world, mainPos);
+
         int radius = GlobalConfig.loadRadiusBlock();
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
@@ -142,10 +151,23 @@ public class BlockRestorer {
         }
     }
 
-    public static void removeBlockAroundMainBlock(ServerLevel world) {
-        world.destroyBlock(mainBlockPos, false);
+    public static void removeBlockAroundMainBlock(ServerLevel world, BlockPos blockPos) {
+        int blockPosX = blockPos.getX();
+        int blockPosY = blockPos.getY();
+        int blockPosZ = blockPos.getZ();
+        int blockMainPosX = mainBlockPos.getX();
+        int blockMainPosY = mainBlockPos.getY();
+        int blockMainPosZ = mainBlockPos.getZ();
+        if (blockPosX != blockMainPosX || blockPosY != blockMainPosY || blockPosZ != blockMainPosZ) {
+            BlockState blockState = world.getBlockState(mainBlockPos);
+            Block.dropResources(blockState, world, mainBlockPos, null, FakePlayerFactory.getMinecraft(world),
+                    FakePlayerFactory.getMinecraft(world).getMainHandItem());
+            world.destroyBlock(mainBlockPos, false);
+        }
+        System.out.println("removeBlockAroundMainBlock");
         aroundBlocksMainBlock.clear();
         perimeterBlocksMainBlock.clear();
+        mainBlockPos = blockPos;
     }
 
     public static void getRestoreBlocks(ServerLevel world) {
@@ -165,15 +187,18 @@ public class BlockRestorer {
                     System.out.println("restoreBlocks");
                     System.out.println(state);
                     iterator.remove();
+                    break;
                 } else {
-                    continue;
+                    if (iterator.hasNext()) {
+                        continue;
+                    }
                 }
             }
         }
     }
 
     public static void getAnimate(ServerLevel world) {
-        if (brokenBlocks.size() > 0 && world != null) {
+        if (brokenBlocks.size() > 0 && world != null && mainBlock != null) {
             for (Map.Entry<BlockPos, BlockState> entry : brokenBlocks.entrySet()) {
                 BlockPos pos = entry.getKey();
                 Animate.destroyedBlocks(world, pos);

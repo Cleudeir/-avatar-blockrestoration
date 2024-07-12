@@ -43,10 +43,10 @@ public class Events {
                 if (checkPeriod(1)) {
                     currentWorld = world;
                 }
-                if (checkPeriod(10) && !isNight) {
+                if (checkPeriod(1) && !isNight) {
                     BlockRestorer.getRestoreBlocks(world);
                 }
-                if (checkPeriod(3)) {
+                if (checkPeriod(4)) {
                     BlockRestorer.getAnimate(world);
                 }
                 if (checkPeriod(15)) {
@@ -60,7 +60,7 @@ public class Events {
     public static void onPutMainBlock(BlockEvent.EntityPlaceEvent event) {
         BlockState getPlacedBlock = event.getPlacedBlock();
         if (getPlacedBlock.getBlock() == GlobalConfig.loadMainBlock()) {
-            System.out.println("A table was placed in the world!");
+            System.out.println("Player placed main block" + getPlacedBlock.toString());
             BlockPos mainPos = event.getPos();
             BlockRestorer.setBlockStatesAroundMainBlock(currentWorld, mainPos);
             BlockRestorer.getAnimate(currentWorld);
@@ -94,7 +94,7 @@ public class Events {
         }
         if (event.getState().getBlock() == GlobalConfig.loadMainBlock() && currentWorld != null) {
             System.out.println("A table was removed from the world!");
-            BlockRestorer.removeBlockAroundMainBlock(currentWorld);
+            BlockRestorer.removeBlockAroundMainBlock(currentWorld, position);
         }
     }
 

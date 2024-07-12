@@ -13,20 +13,20 @@ public class Animate {
                     animationPos.getX() + 0.5,
                     animationPos.getY() + 0.5,
                     animationPos.getZ() + 0.5,
-                    3,
+                    5,
                     0.2,
                     0.2,
                     0.2,
-                    0.05);
+                    0.5);
         }
     }
 
     public static void perimeter(ServerLevel world, BlockPos animationPos) {
-        world.sendParticles(ParticleTypes.ENCHANT,
+        world.sendParticles(ParticleTypes.FALLING_OBSIDIAN_TEAR,
                 animationPos.getX() + 0.5,
                 animationPos.getY() + 0.5,
                 animationPos.getZ() + 0.5,
-                10,
+                5,
                 0.2,
                 0.2,
                 0.2,
