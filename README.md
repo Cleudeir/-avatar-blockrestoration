@@ -1,8 +1,7 @@
-
-                # BlockRestorer.java                
-                ## project structure
-                ```                    
-                avatar-blockrestoration/
+# Avatar-BlockRestorer                
+## project structure
+```                    
+avatar-blockrestoration/
     README.md
     mine.xlsx
     build.gradle
@@ -36,8 +35,8 @@
         wrapper/
             gradle-wrapper.jar
             gradle-wrapper.properties                
-                ```
-                ## Propósito e Descrição do Projeto
+```
+## Propósito e Descrição do Projeto
 
 Este projeto é um mod para Minecraft Forge que restaura blocos quebrados em uma área definida em torno de um bloco principal.  Ele usa um arquivo de configuração para definir os blocos e suas posições, permitindo personalização.  O mod acompanha as mudanças de blocos, salva seus estados para restauração posterior e inclui animações visuais.
 
